@@ -9,23 +9,18 @@
 		$to = '2017/03/02';
 		$Fname = 'A';
 		$sql = "SELECT t.TeamLeadID
-				FROM tSalesTeamInformation t
-				WHERE t.TeamName = '$Fname' ";
+			FROM tSalesTeamInformation t
+			WHERE t.TeamName = '$Fname' ";
 				
-				$result  = mysqli_query($conn,$sql);
-				$count = mysqli_num_rows($result);
-		if($count == 0 )
-		{
+			$result  = mysqli_query($conn,$sql);
+			$count = mysqli_num_rows($result);
+		if($count == 0 ){
 			echo "USER NOT EXIST";
 		}
-		else
-		{
+		else{
 				$row=mysqli_fetch_array($result);
 				$UID=$row['TeamLeadID'];
-		
-		
-		
-		?>
+?>
 		
 		<html>
 			<head>
@@ -49,32 +44,43 @@
 						</thead>
 						<tbody>
 <?php
-						$sql = "SELECT s.Submittedfor, sum(p.SalesCount) as Total
-FROM tproductsalesdataprocessed p , tproductsalesdatasubmitted s,tUserReportingHierarchy t
-WHERE s.ID = p.submitionID 
-and s.ID = t.MembersUserID
-and t.LeadsUserID = '$UID'
-and s.SubmittedDate between '$from' and '$to'
-GROUP BY s.Submittedfor";
-		$result  = mysqli_query($conn,$sql);	
-		$count = mysqli_num_rows($result);
-		while($row=mysqli_fetch_array($result)){			
+	$sql = "SELECT sum(a.Total) as T 
+		FROM (SELECT s.Submittedfor, sum(p.SalesCount) as Total
+			FROM tproductsalesdataprocessed p , tproductsalesdatasubmitted s,tUserReportingHierarchy t
+			WHERE s.ID = p.submitionID 
+			and s.ID = t.MembersUserID
+			and t.LeadsUserID = '$UID'
+			and s.SubmittedDate between '$from' and '$to'
+			GROUP BY s.Submittedfor)a";
+			
+	$result  = mysqli_query($conn,$sql);
+	$row=mysqli_fetch_array($result);
+	$total = $row['T'];	
+			
+	$sql = "SELECT s.Submittedfor, sum(p.SalesCount) as Total
+		FROM tproductsalesdataprocessed p , tproductsalesdatasubmitted s,tUserReportingHierarchy t
+			WHERE s.ID = p.submitionID 	
+			and s.ID = t.MembersUserID
+			and t.LeadsUserID = '$UID'
+			and s.SubmittedDate between '$from' and '$to'
+			GROUP BY s.Submittedfor";
+	$result  = mysqli_query($conn,$sql);	
+	$count = mysqli_num_rows($result);
+	while($row=mysqli_fetch_array($result)){			
 ?>						
-							<tr>
-								
-									<td><?php echo $row['Submittedfor'];?></td>
-									<td><?php echo $row['Total'];?></td>
-									
-							</tr> 
+		<tr>
+			<td><?php echo $row['Submittedfor'];?></td>
+			<td><?php echo $row['Total'];?></td>
+		</tr> 
 <?php
 						}	
 						//$conn->close();
 ?>
-						</tbody>
-						</table>
+		</tbody>
+		</table>
 						
 					
-			</body>
+	</body>
 		<?php
 		
 		
