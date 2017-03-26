@@ -1,5 +1,6 @@
 <?php 	 
 	require("DBConfig.php");
+//While linking please remove these comments 
 //	if(isset($_GET['submit'])){
 //		$from = $_GET['From'];
 //		$to = $_GET['To'];
@@ -48,11 +49,24 @@
 						</thead>
 						<tbody>
 <?php
-						$sql = "SELECT p.ProductCode ,sum(p.SalesCount) as Total
-FROM tproductsalesdataprocessed p , tproductsalesdatasubmitted s
-WHERE p.submitionID = s.ID and s.Submittedfor = '$UID'
-and s.SubmittedDate between '$from' and '$to'
-GROUP BY p.ProductCode";
+//Calculating total, which will be used in calculate percentage 
+$sql = "SELECT sum(a.Total) as T 
+		FROM (SELECT p.ProductCode ,sum(p.SalesCount) as Total
+				FROM tproductsalesdataprocessed p , tproductsalesdatasubmitted s
+				WHERE p.submitionID = s.ID and s.Submittedfor = '$UID'
+				and s.SubmittedDate between '$from' and '$to'
+				GROUP BY p.ProductCode)a";
+		$result  = mysqli_query($conn,$sql);
+		$row=mysqli_fetch_array($result);
+		$total = $row['T'];	
+		//echo $total;
+		
+//To get total sales of each product by specific member	
+$sql = "SELECT p.ProductCode ,sum(p.SalesCount) as Total
+		FROM tproductsalesdataprocessed p , tproductsalesdatasubmitted s
+		WHERE p.submitionID = s.ID and s.Submittedfor = '$UID'
+		and s.SubmittedDate between '$from' and '$to'
+		GROUP BY p.ProductCode";
 		$result  = mysqli_query($conn,$sql);	
 		$count = mysqli_num_rows($result);
 		while($row=mysqli_fetch_array($result)){			
