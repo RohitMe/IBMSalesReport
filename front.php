@@ -37,6 +37,7 @@
 		$row=mysqli_fetch_array($result);
 		$total = $row['T'];	
 		
+		
 ?>
 <!DOCTYPE HTML>
 <html>
